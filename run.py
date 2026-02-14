@@ -5,12 +5,11 @@ from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from config import TOKEN
 from handlers import router
+from os import getenv
 
 async def main():
     logging.basicConfig(level=logging.INFO)
-    bot = Bot(
-        token=TOKEN, 
-        default_properties=DefaultBotProperties(parse_mode=ParseMode.HTML)
+    bot = Bot(token=getenv(TOKEN), default_properties=DefaultBotProperties(parse_mode=ParseMode.HTML)
     )
     dp = Dispatcher()
     dp.include_router(router)
