@@ -3,12 +3,12 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from states import PostState
 import keyboards as kb
-
+from os import getenv
 router = Router()
 
 @router.message(Command("start"))
 async def cmd_start(message: types.Message):
-    if message.from_user.id != ADMIN_ID: return
+    if message.from_user.id != getenv('ADMIN_ID'): return
     await message.answer(
         "ПАНЕЛЬ УПРАВЛЕНИЯ\n\nВыберите действие ниже:", 
         reply_markup=kb.kb_main()
@@ -78,7 +78,7 @@ async def finish_post(message: types.Message, state: FSMContext):
 async def publish_final(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
     data = await state.get_data()
     try:
-        sent = await bot.send_photo(chat_id=CHANNEL_ID,photo=data['photo_id'],caption=data['final_caption'],parse_mode="HTML")
+        sent = await bot.send_photo(chat_id=getenv('CHANNEL_ID'),photo=data['photo_id'],caption=data['final_caption'],parse_mode="HTML")
         await callback.message.edit_text("✅ Опубликовано!", reply_markup=kb.kb_del_post(sent.message_id))
     except Exception as e:
         await callback.message.answer(f"Ошибка: {e}")
@@ -93,7 +93,7 @@ async def reset_post(callback: types.CallbackQuery, state: FSMContext):
 async def drop_post(callback: types.CallbackQuery, bot: Bot):
     msg_id = int(callback.data.split("_")[1])
     try:
-        await bot.delete_message(chat_id=CHANNEL_ID, message_id=msg_id)
+        await bot.delete_message(chat_id=getenv('CHANNEL_ID'), message_id=msg_id)
         await callback.message.edit_text("🗑 Пост удален.")
     except:
         await callback.answer("Не удалось удалить пост.")
