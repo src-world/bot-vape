@@ -11,7 +11,7 @@ router = Router()
 async def cmd_start(message: types.Message):
     if message.from_user.id != ADMIN_ID: return
     await message.answer(
-        "ПАНЕЛЬ УПРАВЛЕНИЯ\n________________________\n\nВыберите действие ниже:", 
+        "ПАНЕЛЬ УПРАВЛЕНИЯ\n\nВыберите действие ниже:", 
         reply_markup=kb.kb_main()
     )
 
@@ -62,29 +62,24 @@ async def finish_post(message: types.Message, state: FSMContext):
 
     flavors_list = "\n\n".join([f"{f} — ✅" for f in data['flavors']])
     caption = (
-        f"{data['name']}\n\n"
-        f"Цена: {data['price']}\n\n"
-        f"Вкусы:\n\n"
-        f"{flavors_list}\n"
-        f"________________________\n\n"
+        f"<b>{data['name']}</b>\n\n"
+        f"<b>Цена:</b> <i>{data['price']}</i>\n\n"
+        f"<b>Вкусы:</b>\n\n"
+        f"{flavors_list}\n\n"
         f"Приобрести у него: @Den_41_ka\n\n"
         f"Вкусы могут обновляться и добавляться новые."
     )
     
     await state.update_data(final_caption=caption)
     await message.answer("ПРЕДПРОСМОТР:", reply_markup=kb.kb_main())
-    await message.answer_photo(photo=data['photo_id'], caption=caption)
+    await message.answer_photo(photo=data['photo_id'], caption=caption,parse_mode="HTML")
     await message.answer("Все верно?", reply_markup=kb.kb_preview_inline())
 
 @router.callback_query(F.data == "publish")
 async def publish_final(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
     data = await state.get_data()
     try:
-        sent = await bot.send_photo(
-            chat_id=CHANNEL_ID,
-            photo=data['photo_id'],
-            caption=data['final_caption']
-        )
+        sent = await bot.send_photo(chat_id=CHANNEL_ID,photo=data['photo_id'],caption=data['final_caption'],parse_mode="HTML")
         await callback.message.edit_text("✅ Опубликовано!", reply_markup=kb.kb_del_post(sent.message_id))
     except Exception as e:
         await callback.message.answer(f"Ошибка: {e}")
