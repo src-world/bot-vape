@@ -1,7 +1,6 @@
 from aiogram import Router, types, F, Bot
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from config import ADMIN_ID, CHANNEL_ID
 from states import PostState
 import keyboards as kb
 
